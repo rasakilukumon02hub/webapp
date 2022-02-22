@@ -1,1 +1,28 @@
-
+pipeline {
+  agent any 
+  tools {
+    maven 'Maven'
+  }
+  stages {
+    stage ('Initialize') {
+      steps {
+        sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+            ''' 
+      }
+    }
+    
+    stage ('Build') {
+      steps {
+      sh 'mvn clean package'
+       }
+    }
+    
+    stage ('upload to artifact') {
+      steps {
+          nexusArtifactUploader artifacts: [[artifactId: 'WebApp', classifier: '', file: 'target/WebApp Maven Webapp-1.0.0', type: 'war']], credentialsId: 'Nexus', groupId: 'lu.amazon.aws.demo', nexusUrl: '54.226.30.167', nexusVersion: 'nexus3', protocol: 'http', repository: 'http://54.173.213.20:8081/repository/artifacts/', version: '1.0.0'
+       }
+    }
+}
+}
